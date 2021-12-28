@@ -1,5 +1,5 @@
 const axios = require('axios');
-// function that executes a function (e.g. a request n Times), conditionally with a randomized delay 1-30 ms
+// function that executes 'function' (e.g. a requester n-Times).  ?randomized delay 1-30 ms
 function runThisNTimes(functionToRun, nTimes, hasDelay = true, timeToExecuteTotalRequests) {
     let _currDelay = 0;
 
@@ -13,13 +13,14 @@ function runThisNTimes(functionToRun, nTimes, hasDelay = true, timeToExecuteTota
 
 
 
-
+// function that sends get request to link
 async function requestThisEndPoint(link) {
     let resp = await axios.get(link)
     console.log(resp.data);
 }
 
-// function to distribute single request delay based on total requests and the time that it takes to complete those requests
+// function to calculate single request delay based on total requests and the time that it takes to complete those requests.
+// aim is requests to be distributed harmonically in their time range.
 function singleRequestDelay(totalRequests, timeToExecuteTotalRequests) {
     let currentRequestAVGDelay = timeToExecuteTotalRequests / totalRequests;
     // console.log(totalRequests, timeToExecuteTotalRequests, currentRequestAVGDelay);
@@ -30,7 +31,8 @@ function singleRequestDelay(totalRequests, timeToExecuteTotalRequests) {
     return currentRequestAVGDelay;
 }
 
-// function that calcs a random number between 1 and 30, as a delay
+// function that calcs a random number between 1 and 30, as a delay.
+// aim is each request to have an extra/less randomized delay time
 function randomDelay(maxDelay = 30) {
     return Math.floor(Math.random() * maxDelay) + 1;
 }
@@ -38,19 +40,19 @@ function randomDelay(maxDelay = 30) {
 
 
 
-function simulation({ samplingRateMs, requestPerSampingRateMsARRAY }) {
-    let array = requestPerSampingRateMsARRAY
+function simulation({ samplingRateMs, requestPerSamplingRateMsARRAY }) {
+    let array = requestPerSamplingRateMsARRAY
 
     array.forEach((item, index) => {
         setTimeout(() => {
-            runThisNTimes(() => requestThisEndPoint('http://localhost:3002/users'), item, true, samplingRateMs)
-        }, 2000 * (index + 1)) // run n request every n times
+            runThisNTimes(() => requestThisEndPoint('http://localhost:8000/mockl'), item, true, samplingRateMs)
+        }, samplingRateMs * (index + 1)) // run Nth request every n times
 
     })
 
 }
 
-
+// # of requests per range-time-unit
 const myArr = [101,
     90,
     151,
@@ -1493,4 +1495,5 @@ const myArr = [101,
     94,
     94,
 ]
-simulation({ samplingRateMs: 60000, requestPerSampingRateMsARRAY: myArr })
+
+simulation({ samplingRateMs: 60000, requestPerSamplingRateMsARRAY: myArr })
